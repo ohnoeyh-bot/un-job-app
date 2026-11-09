@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UN 공고</title>
+<meta name="theme-color" content="#f5f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#13181a" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="UN 공고">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f3ec; --paper: #fffdf8; --ink: #1c2321; --muted: #6a706d; --line: #e3dfd3;
+  --accent: #2f6b4f; --accent-soft: #e4efe8;
+  --good: #2f7d4f; --good-bg: #e3f1e7; --mid: #8a6a12; --mid-bg: #f6eed6; --ref: #3f6a9a; --ref-bg: #e6eef7;
+  --hot: #b4412f; --hot-bg: #f8e5e0; --star: #a86a00;
+  --serif: "Source Serif 4", Georgia, serif;
+  --sans: Inter, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #13181a; --paper: #1b2224; --ink: #e8e6df; --muted: #9aa19e; --line: #2b3335;
+    --accent: #7cc49d; --accent-soft: #1d3329;
+    --good: #86d0a4; --good-bg: #1d3328; --mid: #e3c46e; --mid-bg: #352d17; --ref: #8db7e6; --ref-bg: #1c2a3a;
+    --hot: #f0907e; --hot-bg: #3a221d; --star: #f2b94a;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.55;
+  padding-bottom: env(safe-area-inset-bottom); }
+a { color: var(--accent); }
+[hidden] { display: none !important; }
+.wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 48px; }
+
+header { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top); }
+.bar { max-width: 640px; margin: 0 auto; padding: 12px 16px 10px; }
+.brand { font-family: var(--serif); font-weight: 600; font-size: 20px; }
+.brand b { color: var(--accent); font-weight: 600; }
+.status { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.focus { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 600; color: var(--accent);
+  background: var(--accent-soft); padding: 3px 9px; border-radius: 6px; }
+
+h2.sec { font-size: 12px; letter-spacing: .12em; color: var(--muted); font-weight: 600; margin: 26px 0 12px;
+  display: flex; align-items: center; gap: 10px; }
+h2.sec::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 16px 16px 14px; margin-bottom: 12px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.tag { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+.t-good { color: var(--good); background: var(--good-bg); }
+.t-mid { color: var(--mid); background: var(--mid-bg); }
+.t-ref { color: var(--ref); background: var(--ref-bg); }
+.t-new { color: #fff; background: var(--accent); }
+.t-hot { color: var(--hot); background: var(--hot-bg); }
+.t-plain { color: var(--muted); background: var(--bg); }
+.card h3 { font-size: 17px; line-height: 1.4; margin: 0 0 4px; font-weight: 700; letter-spacing: -.01em; word-break: keep-all; overflow-wrap: anywhere; }
+.org { font-size: 13px; color: var(--muted); }
+.star { margin-top: 10px; font-size: 14px; color: var(--star); font-weight: 600; }
+.star span { color: var(--muted); font-weight: 400; }
+
+details.more { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; }
+details.more summary { font-size: 14px; color: var(--muted); cursor: pointer; list-style: none; padding: 4px 0; }
+details.more summary::-webkit-details-marker { display: none; }
+details.more summary::before { content: "▸ "; }
+details.more[open] summary::before { content: "▾ "; }
+.blk { margin-top: 10px; }
+.blk b { display: block; font-size: 12px; letter-spacing: .06em; color: var(--accent); margin-bottom: 2px; }
+.blk p { margin: 0; font-size: 15px; }
+.blk small { color: var(--muted); }
+.blk ul { margin: 0; padding: 0; list-style: none; font-size: 15px; }
+.blk li { padding: 1px 0; }
+
+.go { display: flex; justify-content: center; align-items: center; margin-top: 12px; padding: 11px; border-radius: 12px;
+  background: var(--accent); color: #fff; font-weight: 600; font-size: 15px; text-decoration: none; }
+@media (prefers-color-scheme: dark) { .go { color: #10201a; } }
+
+details.group > summary { list-style: none; cursor: pointer; }
+details.group > summary::-webkit-details-marker { display: none; }
+details.group > summary h2.sec::before { content: "▸"; }
+details.group[open] > summary h2.sec::before { content: "▾"; }
+.note { font-size: 13px; color: var(--muted); margin: -4px 0 12px; }
+.empty { color: var(--muted); text-align: center; padding: 48px 8px; font-size: 15px; }
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <div class="brand"><b>UN</b> 커리어 공고</div>
+  <div class="status" id="status">불러오는 중…</div>
+  <div class="focus" id="focus" hidden></div>
+</div></header>
+<main class="wrap" id="main"></main>
+
+<script>
+const LV = { good: ["t-good", "🟢 지금 지원 추천"], mid: ["t-mid", "🟡 지원 가능·참고"], ref: ["t-ref", "🔵 아직 자격 미달"] };
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const kstToday = () => { const d = new Date(Date.now() + 9 * 3600e3); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); };
+const day = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const diff = (s) => Math.round((day(s) - kstToday()) / 864e5);
+const md = (s) => { const [, m, d] = s.split("-"); return `${+m}/${+d}`; };
+
+function dTag(j) {
+  if (j.info) return `<span class="tag t-plain">설명회·행사</span>`;
+  if (!j.deadline) return `<span class="tag t-plain">마감 확인 필요</span>`;
+  const n = diff(j.deadline);
+  const txt = n === 0 ? "오늘 마감" : `D-${n}`;
+  return `<span class="tag ${n <= 7 ? "t-hot" : "t-plain"}">마감 ${md(j.deadline)} · ${txt}</span>`;
+}
+
+function card(j) {
+  const lv = LV[j.level] || ["t-plain", ""];
+  const isNew = j.first_seen && diff(j.first_seen) >= -2;
+  const tags = [
+    isNew ? `<span class="tag t-new">NEW</span>` : "",
+    `<span class="tag ${lv[0]}">${j.info ? "🟡 참고" : lv[1]}</span>`,
+    dTag(j),
+    j.intern ? `<span class="tag t-plain">Intern</span>` : "",
+  ].join("");
+  const where = [j.org, j.location, j.grade].filter(Boolean).join(" · ");
+  const checks = (j.checks || []).map((c) => `<li>${esc(c)}</li>`).join("");
+  const checkHead = j.level === "ref" && j.opens ? `🔒 언제 열리나 — ${esc(j.opens)}` : "✅ 자격";
+  return `<article class="card">
+    <div class="tags">${tags}</div>
+    <h3>${esc(j.title)}</h3>
+    <div class="org">${esc(where)}${j.program ? ` · <i>${esc(j.program)}</i>` : ""}</div>
+    ${j.star ? `<div class="star">⭐ 지원해 볼 만함 <span>· ${esc(j.star_reason)}</span></div>` : ""}
+    <details class="more"><summary>강의 설명 · 자격 보기</summary>
+      ${j.lecture ? `<div class="blk"><b>📖 강의에서</b><p>${esc(j.lecture)} <small>(${esc(j.refs)})</small></p></div>` : ""}
+      ${j.plan ? `<div class="blk"><b>🧭 내 설계에서</b><p>${esc(j.plan)}</p></div>` : ""}
+      ${j.french ? `<div class="blk"><b>🇫🇷 불어</b><p>${esc(j.french)}</p></div>` : ""}
+      ${checks ? `<div class="blk"><b>${checkHead}</b><ul>${checks}</ul></div>` : ""}
+      <div class="blk"><small>출처: ${esc(j.source)}</small></div>
+    </details>
+    ${j.url ? `<a class="go" href="${esc(j.url)}" target="_blank" rel="noopener">공고 보기</a>` : ""}
+  </article>`;
+}
+
+function render(data) {
+  const live = data.jobs.filter((j) => !j.deadline || diff(j.deadline) >= 0);
+  const order = (a, b) => (b.star - a.star) || (a.deadline || "9999").localeCompare(b.deadline || "9999") || (b.score - a.score);
+  const now = live.filter((j) => j.level !== "ref" && !j.info).sort(order);
+  const events = live.filter((j) => j.info).sort(order);
+  const later = live.filter((j) => j.level === "ref").sort(order);
+
+  document.getElementById("status").textContent = `${data.updated} 업데이트 · 열린 공고 ${live.length}건`;
+  const f = document.getElementById("focus");
+  if (data.focus) { f.hidden = false; f.textContent = `${md(data.focus.until)}까지 ${data.focus.label} 표시`; }
+
+  let h = "";
+  h += `<h2 class="sec">지금 지원할 수 있는 공고 ${now.length}</h2>`;
+  h += now.length ? now.map(card).join("") :
+    `<div class="empty">지금 열린 공고가 없어요.<br>새 공고가 올라오면 텔레그램으로 한 줄 알려 드려요.</div>`;
+  if (events.length) h += `<h2 class="sec">설명회·행사 ${events.length}</h2>` + events.map(card).join("");
+  if (later.length) h += `<details class="group"><summary><h2 class="sec">아직 자격 미달 · 미리 보기 ${later.length}</h2></summary>
+    <p class="note">경력·학위가 생기면 지원할 수 있는 공고. 공고 읽는 연습용.</p>${later.map(card).join("")}</details>`;
+  document.getElementById("main").innerHTML = h;
+}
+
+fetch("jobs.json", { cache: "no-store" })
+  .then((r) => r.json()).then(render)
+  .catch(() => { document.getElementById("status").textContent = "공고를 불러오지 못했어요. 인터넷 연결을 확인해 주세요."; });
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
