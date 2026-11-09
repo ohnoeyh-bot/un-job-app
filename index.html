@@ -423,7 +423,7 @@ document.addEventListener("click", (e) => {
 // ---------------------------------------------------------------- 앱 안 챗봇
 // 서버(Cloudflare Worker)가 API 키를 들고 있고, 공고 자료도 서버가 직접 읽어 붙인다.
 // 대화는 공고마다 이 휴대폰에 저장 → 다시 열어도 이어서 물어볼 수 있음.
-const CHAT_URL = "";
+const CHAT_URL = "https://un-job-chat.ohnoeyh.workers.dev";
 const PASS_KEY = "unjob-chat-pass";
 let CHAT = null;                                          // { scope, name, key, msgs, busy }
 const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } },
