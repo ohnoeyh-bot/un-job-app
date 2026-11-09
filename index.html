@@ -149,10 +149,26 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
 .wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
 .alt { display: block; text-align: center; font-size: 13px; color: var(--muted); margin: 6px 0 0; background: none; border: 0; font-family: inherit; cursor: pointer; width: 100%; padding: 4px; }
 /* 챗봇 */
-#chat { position: fixed; inset: 0; z-index: 60; background: var(--bg); display: flex; flex-direction: column;
-  transform: translateY(100%); transition: transform .22s ease-out; }
+/* 챗봇: 휴대폰은 아래 절반, 넓은 화면은 오른쪽 옆 — 공고를 보면서 질문 */
+#chat { position: fixed; left: 0; right: 0; bottom: 0; height: 56vh; height: 56dvh; z-index: 60; background: var(--bg);
+  display: flex; flex-direction: column; border-top: 1px solid var(--line); border-radius: 18px 18px 0 0;
+  box-shadow: 0 -8px 28px rgba(0,0,0,.16); overflow: hidden; transform: translateY(105%); transition: transform .22s ease-out; }
 #chat.show { transform: none; }
+#chat .sbar { padding-top: 0; border-radius: 18px 18px 0 0; }
 #chat .sbar .in { max-width: 680px; }
+#chat .grip { width: 38px; height: 4px; border-radius: 2px; background: var(--line); margin: 7px auto 0; }
+body.chatting .wrap { padding-bottom: calc(58vh + 20px); }
+body.chatting #sheet .sbody { padding-bottom: calc(58vh + 20px); }
+body.chatting .fab { display: none; }
+@media (min-width: 900px) {
+  #chat { top: 0; left: auto; width: 420px; height: auto; border-radius: 0; border-top: 0; border-left: 1px solid var(--line);
+    box-shadow: -8px 0 28px rgba(0,0,0,.10); transform: translateX(105%); }
+  #chat .sbar { padding-top: env(safe-area-inset-top); border-radius: 0; }
+  #chat .grip { display: none; }
+  body.chatting header, body.chatting main.wrap { margin-right: 420px; }
+  body.chatting #sheet { right: 420px; }
+  body.chatting .wrap, body.chatting #sheet .sbody { padding-bottom: 40px; }
+}
 #clog { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 #clog .in { max-width: 680px; margin: 0 auto; padding: 14px 14px 8px; }
 .msg { margin: 0 0 12px; font-size: 15.5px; line-height: 1.6; overflow-wrap: anywhere; }
@@ -184,7 +200,7 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
 </div></header>
 <div id="toast" role="status"></div>
 <div id="chat" aria-hidden="true">
-  <div class="sbar"><div class="in"><button id="cclose">‹ 닫기</button><div class="t" id="ctitle"></div><button id="cnew">새 대화</button></div></div>
+  <div class="sbar"><div class="grip"></div><div class="in"><button id="cclose">✕ 닫기</button><div class="t" id="ctitle"></div><button id="cnew">새 대화</button></div></div>
   <div id="clog"><div class="in" id="cmsgs"></div></div>
   <form id="cform"><div class="in"><textarea id="cin" rows="1" placeholder="공고에 대해 물어보세요" enterkeyhint="send"></textarea><button id="csend" type="submit">보내기</button></div></form>
 </div>
@@ -469,7 +485,7 @@ function openChat(scope, name, push = true) {
   const j = scope === "job" ? JOBS[name] : null;
   document.getElementById("ctitle").textContent = j ? j.title : "전체 공고 물어보기";
   const ch = document.getElementById("chat");
-  ch.classList.add("show"); ch.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+  ch.classList.add("show"); ch.setAttribute("aria-hidden", "false"); document.body.classList.add("chatting");
   if (push) history.pushState({ d: scope === "job" ? name : null, c: scope }, "", location.hash || "#");
   chatRender();
 }
@@ -478,7 +494,7 @@ function closeChat() {
   if (!ch.classList.contains("show")) return;
   ch.classList.remove("show"); ch.setAttribute("aria-hidden", "true");
   CHAT = null;
-  if (!sheet.classList.contains("show")) document.body.style.overflow = "";
+  document.body.classList.remove("chatting");
 }
 async function chatSend(q) {
   const c = CHAT;
