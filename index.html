@@ -130,6 +130,18 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
 .file .doc { margin-top: 8px; padding: 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
 .src { font-size: 12px; color: var(--muted); margin-top: 16px; }
 .empty { color: var(--muted); text-align: center; padding: 48px 8px; font-size: 15px; }
+/* Claude에게 묻기 */
+.ask { width: 100%; border: 0; cursor: pointer; font: inherit; background: var(--accent-soft); color: var(--accent); }
+.askall { display: inline-block; margin-top: 8px; font: inherit; font-size: 13px; font-weight: 600; color: var(--accent);
+  background: none; border: 1px solid var(--accent-soft); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+.memo textarea { width: 100%; min-height: 76px; font: inherit; font-size: 14px; color: var(--ink, inherit); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; resize: vertical; box-sizing: border-box; }
+.memo p { font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+#toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
+  z-index: 80; max-width: calc(100% - 32px); background: #1d2a24; color: #fff; font-size: 14px; line-height: 1.45; padding: 11px 15px;
+  border-radius: 12px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; text-align: center; width: 340px; }
+#toast.show { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
+#toast .go { margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -137,7 +149,9 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
   <div class="brand"><b>UN</b> 커리어 공고</div>
   <div class="status" id="status">불러오는 중…</div>
   <div class="focus" id="focus" hidden></div>
+  <div><button class="askall" id="askall" hidden>💬 전체 공고 Claude에게 묻기</button></div>
 </div></header>
+<div id="toast" role="status"></div>
 <main class="wrap" id="main"></main>
 <div id="sheet" aria-hidden="true">
   <div class="sbar"><div class="in"><button id="close">‹ 목록</button><div class="t" id="stitle"></div></div></div>
@@ -228,7 +242,8 @@ function blocks(list) {
   }).join("");
 }
 function detailHtml(j, d) {
-  let h = `<div class="tags">${dTag(j)}</div><h2 class="dt">${esc(j.title)}</h2>`;
+  const askBtn = `<button class="go ask" data-ask="1">💬 이 공고 Claude에게 묻기</button>`;
+  let h = `<div class="tags">${dTag(j)}</div><h2 class="dt">${esc(j.title)}</h2>${askBtn}`;
   if (d.error) h += `<div class="box"><b>안내</b><p>${esc(d.error)}</p></div>`;
   const kp = Object.entries(d.key || {});
   if (kp.length) h += `<div class="box"><b>핵심 정리 · 원문 줄 그대로</b>${kp.map(([k, v]) =>
@@ -244,6 +259,10 @@ function detailHtml(j, d) {
       ${f.kind === "image" ? `<img src="${esc(f.url)}" loading="lazy" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
       ${f.body ? `<details><summary>파일 내용 펼치기 (${f.body.length}줄)</summary><div class="doc">${blocks(f.body)}</div></details>` : ""}
     </div>`).join("")}</div>`;
+  h += askBtn;
+  h += `<details class="box memo"><summary><b style="display:inline">내 상황 메모 · Claude에게 같이 전달</b></summary>
+    <p>한 번 적어 두면 이 휴대폰에 저장되고, 모든 공고 질문에 같이 붙어요.</p>
+    <textarea id="memo" placeholder="예: 2027년 8월 학부 졸업 예정, 불어·영어 가능, 겨울방학에만 출국 가능, 관심 지역 불어권 아프리카">${esc(getMemo())}</textarea></details>`;
   if (j.url) h += `<a class="go" href="${esc(j.url)}" target="_blank" rel="noopener">원문 공고 열기</a>`;
   h += `<p class="src">${esc(d.fetched)} 수집 · 문장은 원문 그대로 두고 줄만 나눴어요. 중요한 내용은 원문으로 한 번 더 확인하세요.</p>`;
   return h;
@@ -258,10 +277,11 @@ function openDetail(name, push = true) {
   document.body.style.overflow = "hidden";
   if (push) history.pushState({ d: name }, "", "#d=" + name);
   fetch(`details/${name}.json`, { cache: "no-store" }).then((r) => r.json())
-    .then((d) => { document.getElementById("sbody").innerHTML = detailHtml(j, d); })
+    .then((d) => { CUR = { j, d }; document.getElementById("sbody").innerHTML = detailHtml(j, d); })
     .catch(() => { document.getElementById("sbody").innerHTML = `<p class="empty">상세를 불러오지 못했어요.</p>`; });
 }
 function closeDetail() {
+  CUR = null;
   sheet.classList.remove("show"); sheet.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
 }
@@ -274,9 +294,97 @@ document.getElementById("close").addEventListener("click", () => {
 });
 window.addEventListener("popstate", (e) => { if (e.state && e.state.d) openDetail(e.state.d, false); else closeDetail(); });
 
+// ---------------------------------------------------------------- Claude에게 묻기
+// API 키 없이: 공고 자료 전체를 복사하고 Claude 새 대화를 연다 → 붙여넣으면 그 대화 내내 자료를 기억함
+let CUR = null, DATA = null;
+const MEMO_KEY = "unjob-memo";
+function getMemo() { try { return localStorage.getItem(MEMO_KEY) || ""; } catch { return ""; } }
+function setMemo(v) { try { localStorage.setItem(MEMO_KEY, v); } catch {} }
+document.addEventListener("input", (e) => { if (e.target.id === "memo") setMemo(e.target.value); });
+
+const todayStr = () => kstToday().toISOString().slice(0, 10);
+const RULES = (what) => `아래는 내가 지원을 검토 중인 ${what} 자료야. 이 대화가 끝날 때까지 이 자료 전체를 기억하고, 내 질문에는 이 자료를 근거로 답해줘.
+- 자료에 없는 내용은 지어내지 말고 "공고에 없음"이라고 말해줘. 일반 지식으로 보충할 때는 "(일반 정보)"라고 표시해줘.
+- 날짜·기간·자격·제출 서류처럼 중요한 건 원문 문장을 그대로 인용해줘.
+- 한국어로, 짧고 직설적으로 답해줘.
+- 오늘 날짜: ${todayStr()}`;
+const txt = (list) => (list || []).map((b) => b.t === "h1" ? `\n## ${b.x}` : b.t === "h2" ? `### ${b.x}` : b.t === "li" ? `- ${b.x}` : b.x).join("\n");
+function jobMeta(j) {
+  const L = [];
+  L.push(`제목: ${j.title}`);
+  [["기관", j.org], ["출처", j.source], ["근무지", j.location], ["직급·유형", j.grade], ["게시일", j.posted],
+   ["마감", j.deadline ? j.deadline + (j.deadline_from_body ? " (본문에서 찾은 날짜)" : "") : "목록에 없음"], ["원문 주소", j.url]]
+    .forEach(([k, v]) => v && L.push(`${k}: ${v}`));
+  if (j.program) L.push(`프로그램 분류: ${j.program}`);
+  if (j.lecture) L.push(`수업에서 들은 설명: ${j.lecture}${j.refs ? ` (${j.refs})` : ""}`);
+  if (j.plan) L.push(`내 진로 설계상 위치: ${j.plan}`);
+  if ((j.checks || []).length) L.push(`자격 자동 판정(✓ 충족 / ✗ 미충족 / · 직접 확인):\n${j.checks.map((c) => "  " + c).join("\n")}`);
+  if (j.opens) L.push(`자격이 열리는 시점: ${j.opens}`);
+  if (j.french) L.push(`불어 관련: ${j.french}`);
+  if (j.star) L.push(`봇 판단: ⭐ 지원해 볼 만함 — ${j.star_reason}`);
+  return L.join("\n");
+}
+function jobContext(j, d) {
+  const memo = getMemo().trim();
+  let t = RULES("공고") + "\n\n";
+  t += `[내 상황]\n${memo || "(메모 없음 — 아래 자격 자동 판정 참고)"}\n\n`;
+  t += `[공고 정보]\n${jobMeta(j)}\n\n`;
+  const kp = Object.entries(d.key || {});
+  if (kp.length) t += `[핵심 줄 (원문 그대로)]\n${kp.map(([k, v]) => `${k}:\n${v.map((x) => "  " + x).join("\n")}`).join("\n")}\n\n`;
+  if ((d.body || []).length) t += `[공고 본문 전체]\n${txt(d.body)}\n\n`;
+  (d.files || []).forEach((f) => {
+    t += `[첨부파일: ${f.name}]\n${f.body ? txt(f.body) : `(내용 없음 — ${f.note || "글자를 뽑지 못함"}) 주소: ${f.url}`}\n\n`;
+  });
+  if ((d.links || []).length) t += `[본문 속 링크]\n${d.links.map((l) => `${l.name}: ${l.url}`).join("\n")}\n\n`;
+  t += "자료 끝. 위 내용을 다 읽었으면 \"공고 자료를 읽었어요\"라고만 짧게 답하고, 내 질문을 기다려줘.";
+  return t;
+}
+function listContext(data) {
+  const live = data.jobs.filter((j) => !j.deadline || diff(j.deadline) >= 0);
+  const memo = getMemo().trim();
+  let t = RULES(`공고 목록(${live.length}건)`) + "\n- 각 공고의 본문 전체는 여기 없어. 세부 내용이 필요하면 그 공고 앱 화면에서 따로 넘겨 달라고 말해줘.\n\n";
+  t += `[내 상황]\n${memo || "(메모 없음 — 각 공고의 자격 자동 판정 참고)"}\n\n`;
+  live.forEach((j, i) => { t += `[공고 ${i + 1}]\n${jobMeta(j)}\n\n`; });
+  t += "자료 끝. 다 읽었으면 \"목록을 읽었어요\"라고만 짧게 답하고, 내 질문을 기다려줘.";
+  return t;
+}
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 4000);
+}
+function copyText(t) {                                    // 클릭 순간에 바로 복사 (iOS는 버튼 누른 순간만 허용)
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t).then(() => true, () => fallbackCopy(t));
+  return Promise.resolve(fallbackCopy(t));
+}
+function fallbackCopy(t) {
+  const ta = document.createElement("textarea");
+  ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, t.length);
+  let ok = false; try { ok = document.execCommand("copy"); } catch {}
+  ta.remove(); return ok;
+}
+function askClaude(text) {                               // ① 누르면 복사 → ② 'Claude 열기' 버튼으로 새 대화
+  copyText(text).then((ok) => {
+    const el = document.getElementById("toast");
+    el.innerHTML = ok
+      ? `공고 자료 ${text.length.toLocaleString()}자를 복사했어요.<br>Claude 입력창에 <b>붙여넣기 → 보내기</b> 하세요.
+         <a class="go" href="https://claude.ai/new" target="_blank" rel="noopener">Claude 열기</a>`
+      : "복사가 막혔어요. 다시 한 번 눌러 주세요.";
+    el.classList.add("show");
+    clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 12000);
+  });
+}
+document.addEventListener("click", (e) => {
+  if (e.target.closest("#toast a")) setTimeout(() => document.getElementById("toast").classList.remove("show"), 300);
+  if (e.target.closest("[data-ask]") && CUR) { e.preventDefault(); askClaude(jobContext(CUR.j, CUR.d)); }
+  if (e.target.closest("#askall") && DATA) { e.preventDefault(); askClaude(listContext(DATA)); }
+});
+
 fetch("jobs.json", { cache: "no-store" })
   .then((r) => r.json())
   .then((data) => {
+    DATA = data; document.getElementById("askall").hidden = false;
     data.jobs.forEach((j) => { if (j.detail) JOBS[j.detail] = j; });
     render(data);
     const m = location.hash.match(/^#d=(.+)$/);           // 주소로 바로 열기 (새로고침해도 유지)
