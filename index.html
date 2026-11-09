@@ -142,6 +142,33 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
   border-radius: 12px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; text-align: center; width: 340px; }
 #toast.show { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
 #toast .go { margin-top: 10px; }
+.alt { display: block; text-align: center; font-size: 13px; color: var(--muted); margin: 6px 0 0; background: none; border: 0; font-family: inherit; cursor: pointer; width: 100%; padding: 4px; }
+/* 챗봇 */
+#chat { position: fixed; inset: 0; z-index: 60; background: var(--bg); display: flex; flex-direction: column;
+  transform: translateY(100%); transition: transform .22s ease-out; }
+#chat.show { transform: none; }
+#chat .sbar .in { max-width: 680px; }
+#clog { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+#clog .in { max-width: 680px; margin: 0 auto; padding: 14px 14px 8px; }
+.msg { margin: 0 0 12px; font-size: 15.5px; line-height: 1.6; overflow-wrap: anywhere; }
+.msg.u { margin-left: 18%; background: var(--accent); color: #fff; padding: 9px 13px; border-radius: 16px 16px 4px 16px; white-space: pre-wrap; }
+@media (prefers-color-scheme: dark) { .msg.u { color: #10201a; } }
+.msg.a { background: var(--paper); border: 1px solid var(--line); padding: 10px 14px; border-radius: 16px 16px 16px 4px; }
+.msg.a p { margin: 0 0 6px; } .msg.a p:last-child { margin-bottom: 0; }
+.msg.a .li { padding-left: 14px; text-indent: -14px; }
+.msg.a h6 { font-size: 15px; margin: 10px 0 4px; }
+.msg.a.wait::after { content: "생각하는 중…"; color: var(--muted); font-size: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+.chips button { font: inherit; font-size: 14px; color: var(--accent); background: var(--accent-soft); border: 0; border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+.chint { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+#cform { border-top: 1px solid var(--line); background: var(--bg); padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); }
+#cform .in { max-width: 680px; margin: 0 auto; display: flex; gap: 8px; align-items: flex-end; }
+#cin { flex: 1; font: inherit; font-size: 16px; color: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+  padding: 9px 12px; resize: none; max-height: 140px; min-height: 42px; box-sizing: border-box; }
+#csend { font: inherit; font-weight: 600; font-size: 15px; border: 0; border-radius: 12px; background: var(--accent); color: #fff; padding: 10px 14px; cursor: pointer; }
+#csend:disabled { opacity: .45; }
+.pass { display: flex; gap: 8px; margin: 6px 0 12px; }
+.pass input { flex: 1; font: inherit; font-size: 16px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: inherit; }
 </style>
 </head>
 <body>
@@ -149,9 +176,14 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
   <div class="brand"><b>UN</b> 커리어 공고</div>
   <div class="status" id="status">불러오는 중…</div>
   <div class="focus" id="focus" hidden></div>
-  <div><button class="askall" id="askall" hidden>💬 전체 공고 Claude에게 묻기</button></div>
+  <div><button class="askall" id="askall" hidden>💬 전체 공고 물어보기</button></div>
 </div></header>
 <div id="toast" role="status"></div>
+<div id="chat" aria-hidden="true">
+  <div class="sbar"><div class="in"><button id="cclose">‹ 닫기</button><div class="t" id="ctitle"></div><button id="cnew">새 대화</button></div></div>
+  <div id="clog"><div class="in" id="cmsgs"></div></div>
+  <form id="cform"><div class="in"><textarea id="cin" rows="1" placeholder="공고에 대해 물어보세요" enterkeyhint="send"></textarea><button id="csend" type="submit">보내기</button></div></form>
+</div>
 <main class="wrap" id="main"></main>
 <div id="sheet" aria-hidden="true">
   <div class="sbar"><div class="in"><button id="close">‹ 목록</button><div class="t" id="stitle"></div></div></div>
@@ -242,7 +274,9 @@ function blocks(list) {
   }).join("");
 }
 function detailHtml(j, d) {
-  const askBtn = `<button class="go ask" data-ask="1">💬 이 공고 Claude에게 묻기</button>`;
+  const askBtn = CHAT_URL
+    ? `<button class="go ask" data-chat="job">💬 이 공고 물어보기</button><button class="alt" data-ask="1">Claude 앱으로 넘기기</button>`
+    : `<button class="go ask" data-ask="1">💬 이 공고 Claude에게 묻기</button>`;
   let h = `<div class="tags">${dTag(j)}</div><h2 class="dt">${esc(j.title)}</h2>${askBtn}`;
   if (d.error) h += `<div class="box"><b>안내</b><p>${esc(d.error)}</p></div>`;
   const kp = Object.entries(d.key || {});
@@ -292,7 +326,12 @@ document.addEventListener("click", (e) => {
 document.getElementById("close").addEventListener("click", () => {
   if (history.state && history.state.d) history.back(); else { closeDetail(); history.replaceState(null, "", location.pathname); }
 });
-window.addEventListener("popstate", (e) => { if (e.state && e.state.d) openDetail(e.state.d, false); else closeDetail(); });
+window.addEventListener("popstate", (e) => {
+  const st = e.state || {};
+  if (!st.c) closeChat();
+  if (st.d) { if (!(CUR && CUR.j.detail === st.d && sheet.classList.contains("show"))) openDetail(st.d, false); } else closeDetail();
+  if (st.c) openChat(st.c, st.d, false);
+});
 
 // ---------------------------------------------------------------- Claude에게 묻기
 // API 키 없이: 공고 자료 전체를 복사하고 Claude 새 대화를 연다 → 붙여넣으면 그 대화 내내 자료를 기억함
@@ -378,7 +417,119 @@ function askClaude(text) {                               // ① 누르면 복사
 document.addEventListener("click", (e) => {
   if (e.target.closest("#toast a")) setTimeout(() => document.getElementById("toast").classList.remove("show"), 300);
   if (e.target.closest("[data-ask]") && CUR) { e.preventDefault(); askClaude(jobContext(CUR.j, CUR.d)); }
-  if (e.target.closest("#askall") && DATA) { e.preventDefault(); askClaude(listContext(DATA)); }
+  if (e.target.closest("#askall") && DATA) { e.preventDefault(); if (CHAT_URL) openChat("all", null); else askClaude(listContext(DATA)); }
+});
+
+// ---------------------------------------------------------------- 앱 안 챗봇
+// 서버(Cloudflare Worker)가 API 키를 들고 있고, 공고 자료도 서버가 직접 읽어 붙인다.
+// 대화는 공고마다 이 휴대폰에 저장 → 다시 열어도 이어서 물어볼 수 있음.
+const CHAT_URL = "";
+const PASS_KEY = "unjob-chat-pass";
+let CHAT = null;                                          // { scope, name, key, msgs, busy }
+const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+             set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+             del(k) { try { localStorage.removeItem(k); } catch {} } };
+const chatKey = (scope, name) => "unjob-chat:" + (scope === "all" ? "all" : name);
+const SUGGEST = {
+  job: ["파견·근무 기간이 얼마나 돼?", "내가 지원 자격이 돼?", "제출 서류를 정리해줘", "마감까지 할 일을 날짜순으로", "이 공고의 함정이나 주의할 점은?"],
+  all: ["지금 나한테 제일 맞는 공고는?", "마감이 가까운 순서로 정리해줘", "방학 중에 갈 수 있는 건?", "불어를 살릴 수 있는 공고는?"],
+};
+function mdText(t) {                                          // 답변용 아주 작은 마크다운
+  return esc(t).split("\n").map((line) => {
+    let x = line.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+      .replace(/https?:\/\/[^\s<>"')]+/g, (u) => `<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
+    if (/^#{1,6}\s/.test(line)) return `<h6>${x.replace(/^#{1,6}\s/, "")}</h6>`;
+    if (/^\s*[-*•]\s/.test(line)) return `<p class="li">• ${x.replace(/^\s*[-*•]\s/, "")}</p>`;
+    if (/^\s*\d+[.)]\s/.test(line)) return `<p class="li">${x.trim()}</p>`;
+    return x.trim() ? `<p>${x}</p>` : "";
+  }).join("");
+}
+function chatRender() {
+  const c = CHAT, el = document.getElementById("cmsgs");
+  let h = "";
+  if (!ls.get(PASS_KEY)) h += `<p class="chint">처음 한 번만 챗봇 암호를 넣어 주세요. 이 휴대폰에 저장돼요.</p>
+    <div class="pass"><input id="cpass" type="password" autocomplete="current-password" placeholder="챗봇 암호"><button class="go" id="cpsave" type="button" style="margin:0">저장</button></div>`;
+  if (!c.msgs.length) h += `<p class="chint">${c.scope === "all" ? "지금 열린 공고 전체" : "이 공고의 본문·첨부파일 전체"}와 수업 설명, 자격 판정, 내 상황 메모를 Claude가 읽고 답해요. 공고에 없는 건 "공고에 없음"이라고 말해요.</p>
+    <div class="chips">${SUGGEST[c.scope].map((q) => `<button type="button" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>`;
+  h += c.msgs.map((m, i) => m.role === "user" ? `<div class="msg u">${esc(m.content)}</div>`
+    : `<div class="msg a${!m.content && c.busy && i === c.msgs.length - 1 ? " wait" : ""}">${mdText(m.content)}</div>`).join("");
+  el.innerHTML = h;
+  const log = document.getElementById("clog"); log.scrollTop = log.scrollHeight;
+  document.getElementById("csend").disabled = c.busy;
+}
+function openChat(scope, name, push = true) {
+  const key = chatKey(scope, name);
+  let msgs = []; try { msgs = JSON.parse(ls.get(key) || "[]"); } catch {}
+  CHAT = { scope, name, key, msgs, busy: false };
+  const j = scope === "job" ? JOBS[name] : null;
+  document.getElementById("ctitle").textContent = j ? j.title : "전체 공고 물어보기";
+  const ch = document.getElementById("chat");
+  ch.classList.add("show"); ch.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+  if (push) history.pushState({ d: scope === "job" ? name : null, c: scope }, "", location.hash || "#");
+  chatRender();
+}
+function closeChat() {
+  const ch = document.getElementById("chat");
+  if (!ch.classList.contains("show")) return;
+  ch.classList.remove("show"); ch.setAttribute("aria-hidden", "true");
+  CHAT = null;
+  if (!sheet.classList.contains("show")) document.body.style.overflow = "";
+}
+async function chatSend(q) {
+  const c = CHAT;
+  if (!c || c.busy || !q.trim()) return;
+  const pass = ls.get(PASS_KEY);
+  if (!pass) { toast("먼저 챗봇 암호를 넣어 주세요."); return; }
+  c.msgs.push({ role: "user", content: q.trim() }, { role: "assistant", content: "" });
+  c.busy = true; chatRender();
+  const ans = c.msgs[c.msgs.length - 1];
+  try {
+    const r = await fetch(CHAT_URL, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pass, scope: c.scope, detail: c.name, memo: getMemo(), messages: c.msgs.slice(0, -1) }) });
+    if (r.status === 401) { ls.del(PASS_KEY); throw new Error("암호가 맞지 않아요. 다시 넣어 주세요."); }
+    if (!r.ok) throw new Error(await r.text() || `서버 오류 (${r.status})`);
+    const rd = r.body.getReader(), dec = new TextDecoder();
+    let last = 0;
+    for (;;) {
+      const { value, done } = await rd.read();
+      if (done) break;
+      ans.content += dec.decode(value, { stream: true });
+      if (CHAT === c && Date.now() - last > 80) { chatRender(); last = Date.now(); }
+    }
+    ans.content += dec.decode();
+  } catch (e) {
+    ans.content += (ans.content ? "\n\n" : "") + "⚠️ " + (e.message || "연결이 끊겼어요.");
+  }
+  c.busy = false;
+  if (!ans.content.trim()) ans.content = "⚠️ 빈 답이 왔어요. 다시 물어봐 주세요.";
+  ls.set(c.key, JSON.stringify(c.msgs.slice(-40)));
+  if (CHAT === c) chatRender();
+}
+document.getElementById("cform").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const inp = document.getElementById("cin"); const q = inp.value; inp.value = ""; inp.style.height = "";
+  chatSend(q);
+});
+document.getElementById("cin").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing && matchMedia("(pointer: fine)").matches) {
+    e.preventDefault(); document.getElementById("cform").requestSubmit();
+  }
+});
+document.getElementById("cin").addEventListener("input", (e) => { e.target.style.height = ""; e.target.style.height = e.target.scrollHeight + "px"; });
+document.getElementById("cclose").addEventListener("click", () => { if (history.state && history.state.c) history.back(); else closeChat(); });
+document.getElementById("cnew").addEventListener("click", () => {
+  if (!CHAT || CHAT.busy) return;
+  CHAT.msgs = []; ls.del(CHAT.key); chatRender();
+});
+document.addEventListener("click", (e) => {
+  const chip = e.target.closest("[data-q]"); if (chip) { chatSend(chip.dataset.q); return; }
+  if (e.target.closest("#cpsave")) {
+    const v = document.getElementById("cpass").value.trim();
+    if (v) { ls.set(PASS_KEY, v); chatRender(); }
+    return;
+  }
+  const b = e.target.closest("[data-chat]");
+  if (b && CUR) { e.preventDefault(); openChat("job", CUR.j.detail); }
 });
 
 fetch("jobs.json", { cache: "no-store" })
