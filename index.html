@@ -142,11 +142,12 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
   border-radius: 12px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; text-align: center; width: 340px; }
 #toast.show { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
 #toast .go { margin-top: 10px; }
-.fab { position: fixed; z-index: 40; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom));
-  width: min(608px, calc(100% - 32px)); padding: 14px; border: 0; border-radius: 14px; cursor: pointer;
-  font: inherit; font-size: 16px; font-weight: 600; background: var(--accent); color: #fff; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+.fab { position: fixed; z-index: 55; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
+  width: 54px; height: 54px; border-radius: 50%; border: 0; cursor: pointer; padding: 0;
+  font: inherit; font-size: 17px; font-weight: 700; letter-spacing: .02em; background: var(--accent); color: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,.22); }
 @media (prefers-color-scheme: dark) { .fab { color: #10201a; } }
-.wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+.wrap { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
 .alt { display: block; text-align: center; font-size: 13px; color: var(--muted); margin: 6px 0 0; background: none; border: 0; font-family: inherit; cursor: pointer; width: 100%; padding: 4px; }
 /* 챗봇 */
 /* 챗봇: 휴대폰은 아래 절반, 넓은 화면은 오른쪽 옆 — 공고를 보면서 질문 */
@@ -205,7 +206,7 @@ body.chatting .fab { display: none; }
   <form id="cform"><div class="in"><textarea id="cin" rows="1" placeholder="공고에 대해 물어보세요" enterkeyhint="send"></textarea><button id="csend" type="submit">보내기</button></div></form>
 </div>
 <main class="wrap" id="main"></main>
-<button class="fab" id="askall" hidden>💬 전체 공고 물어보기</button>
+<button class="fab" id="askall" hidden aria-label="AI에게 물어보기" title="AI에게 물어보기">AI</button>
 <div id="sheet" aria-hidden="true">
   <div class="sbar"><div class="in"><button id="close">‹ 목록</button><div class="t" id="stitle"></div></div></div>
   <div class="sbody" id="sbody"></div>
@@ -438,7 +439,12 @@ function askClaude(text) {                               // ① 누르면 복사
 document.addEventListener("click", (e) => {
   if (e.target.closest("#toast a")) setTimeout(() => document.getElementById("toast").classList.remove("show"), 300);
   if (e.target.closest("[data-ask]") && CUR) { e.preventDefault(); askClaude(jobContext(CUR.j, CUR.d)); }
-  if (e.target.closest("#askall") && DATA) { e.preventDefault(); if (CHAT_URL) openChat("all", null); else askClaude(listContext(DATA)); }
+  if (e.target.closest("#askall") && DATA) {                // 공고 화면이면 그 공고, 목록이면 전체
+    e.preventDefault();
+    const inDetail = CUR && sheet.classList.contains("show");
+    if (CHAT_URL) openChat(inDetail ? "job" : "all", inDetail ? CUR.j.detail : null);
+    else askClaude(inDetail ? jobContext(CUR.j, CUR.d) : listContext(DATA));
+  }
 });
 
 // ---------------------------------------------------------------- 앱 안 챗봇
