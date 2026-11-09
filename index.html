@@ -143,10 +143,12 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
 #toast.show { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
 #toast .go { margin-top: 10px; }
 .fab { position: fixed; z-index: 55; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
-  width: 54px; height: 54px; border-radius: 50%; border: 0; cursor: pointer; padding: 0;
-  font: inherit; font-size: 17px; font-weight: 700; letter-spacing: .02em; background: var(--accent); color: #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,.22); }
-@media (prefers-color-scheme: dark) { .fab { color: #10201a; } }
+  height: 50px; padding: 0 18px 0 15px; border-radius: 9999px; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 15px; font-weight: 700; letter-spacing: .04em;
+  background: var(--ink); color: var(--bg); box-shadow: 0 10px 32px rgba(0,0,0,.28); transition: transform .18s ease, box-shadow .18s ease; }
+.fab:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(0,0,0,.32); }
+.fab svg { display: block; }
+@media (min-width: 900px) { .fab { right: 22px; bottom: 22px; } }
 .wrap { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
 .alt { display: block; text-align: center; font-size: 13px; color: var(--muted); margin: 6px 0 0; background: none; border: 0; font-family: inherit; cursor: pointer; width: 100%; padding: 4px; }
 /* 챗봇 */
@@ -162,13 +164,12 @@ body.chatting .wrap { padding-bottom: calc(58vh + 20px); }
 body.chatting #sheet .sbody { padding-bottom: calc(58vh + 20px); }
 body.chatting .fab { display: none; }
 @media (min-width: 900px) {
-  #chat { top: 0; left: auto; width: 420px; height: auto; border-radius: 0; border-top: 0; border-left: 1px solid var(--line);
-    box-shadow: -8px 0 28px rgba(0,0,0,.10); transform: translateX(105%); }
-  #chat .sbar { padding-top: env(safe-area-inset-top); border-radius: 0; }
-  #chat .grip { display: none; }
-  body.chatting header, body.chatting main.wrap { margin-right: 420px; }
-  body.chatting #sheet { right: 420px; }
+  #chat { left: auto; right: 20px; bottom: 20px; width: 380px; height: 560px; max-height: calc(100vh - 40px);
+    border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 -6px 20px rgba(0,0,0,.06), 0 20px 60px rgba(0,0,0,.18);
+    transform: translateY(calc(100% + 40px)); transition: transform .32s cubic-bezier(.22,1,.36,1); }
+  #chat .sbar { border-radius: 20px 20px 0 0; }
   body.chatting .wrap, body.chatting #sheet .sbody { padding-bottom: 40px; }
+}
 }
 #clog { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 #clog .in { max-width: 680px; margin: 0 auto; padding: 14px 14px 8px; }
@@ -206,7 +207,7 @@ body.chatting .fab { display: none; }
   <form id="cform"><div class="in"><textarea id="cin" rows="1" placeholder="공고에 대해 물어보세요" enterkeyhint="send"></textarea><button id="csend" type="submit">보내기</button></div></form>
 </div>
 <main class="wrap" id="main"></main>
-<button class="fab" id="askall" hidden aria-label="AI에게 물어보기" title="AI에게 물어보기">AI</button>
+<button class="fab" id="askall" hidden aria-label="AI에게 물어보기" title="AI에게 물어보기"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg><span>AI</span></button>
 <div id="sheet" aria-hidden="true">
   <div class="sbar"><div class="in"><button id="close">‹ 목록</button><div class="t" id="stitle"></div></div></div>
   <div class="sbody" id="sbody"></div>
