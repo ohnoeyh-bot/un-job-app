@@ -142,6 +142,11 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
   border-radius: 12px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; text-align: center; width: 340px; }
 #toast.show { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
 #toast .go { margin-top: 10px; }
+.fab { position: fixed; z-index: 40; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom));
+  width: min(608px, calc(100% - 32px)); padding: 14px; border: 0; border-radius: 14px; cursor: pointer;
+  font: inherit; font-size: 16px; font-weight: 600; background: var(--accent); color: #fff; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+@media (prefers-color-scheme: dark) { .fab { color: #10201a; } }
+.wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
 .alt { display: block; text-align: center; font-size: 13px; color: var(--muted); margin: 6px 0 0; background: none; border: 0; font-family: inherit; cursor: pointer; width: 100%; padding: 4px; }
 /* 챗봇 */
 #chat { position: fixed; inset: 0; z-index: 60; background: var(--bg); display: flex; flex-direction: column;
@@ -176,7 +181,6 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
   <div class="brand"><b>UN</b> 커리어 공고</div>
   <div class="status" id="status">불러오는 중…</div>
   <div class="focus" id="focus" hidden></div>
-  <div><button class="askall" id="askall" hidden>💬 전체 공고 물어보기</button></div>
 </div></header>
 <div id="toast" role="status"></div>
 <div id="chat" aria-hidden="true">
@@ -185,6 +189,7 @@ table.facts td { padding: 5px 0; overflow-wrap: anywhere; }
   <form id="cform"><div class="in"><textarea id="cin" rows="1" placeholder="공고에 대해 물어보세요" enterkeyhint="send"></textarea><button id="csend" type="submit">보내기</button></div></form>
 </div>
 <main class="wrap" id="main"></main>
+<button class="fab" id="askall" hidden>💬 전체 공고 물어보기</button>
 <div id="sheet" aria-hidden="true">
   <div class="sbar"><div class="in"><button id="close">‹ 목록</button><div class="t" id="stitle"></div></div></div>
   <div class="sbody" id="sbody"></div>
