@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-10 11:46",
- "today": "2026-11-10",
+ "updated": "2026-11-11 09:42",
+ "today": "2026-11-11",
  "focus": {
   "until": "2026-12-31",
   "label": "수업에서 언급한 봉사단만"
@@ -35,6 +35,35 @@
    "score": 290,
    "detail": "koica_volunteer_370793",
    "deadline_from_body": true
+  },
+  {
+   "key": "unv:1784888021273907",
+   "title": "Donor Relations Specialist",
+   "url": "https://app.unv.org/opportunities/1784888021273907",
+   "org": "UNICEF",
+   "source": "UNV",
+   "location": "Conakry, Guinea",
+   "grade": "UNV International Specialist",
+   "posted": "2026-11-10",
+   "deadline": "2026-11-24",
+   "first_seen": "2026-11-11",
+   "level": "ref",
+   "info": false,
+   "intern": false,
+   "category": "",
+   "star": false,
+   "star_reason": "",
+   "program": "국제 UNV",
+   "lecture": "UN이 직접 뽑는 국제 UNV는 \"맨땅에 헤딩\" — 외교부·코이카 UNV보다 어렵다. 유급, 끝나면 P 전환 가능.",
+   "refs": "11/05 문단 24–26",
+   "plan": "2029~ 단계. 지금은 불어권 근무지·요구 경력을 미리 보는 용도.",
+   "checks": [
+    "✗ 전문가·경력직 UNV → 관련 경력 필요"
+   ],
+   "opens": "관련 경력 2년 이후(설계상 2029~)",
+   "french": "불어 필수 — 내 최대 강점 (UN 업무 언어 영어·불어 중 하나) (10/29 문단 160–165)",
+   "score": 155,
+   "detail": "unv_1784888021273907"
   },
   {
    "key": "unv:1784888021273883",
