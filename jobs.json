@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-12 10:55",
- "today": "2026-11-12",
+ "updated": "2026-11-13 10:07",
+ "today": "2026-11-13",
  "focus": {
   "until": "2026-12-31",
   "label": "수업에서 언급한 봉사단만"
@@ -209,64 +209,6 @@
    "french": "불어 우대 — 내 강점 (10/29 문단 160–165)",
    "score": 145,
    "detail": "unv_1784888021273876"
-  },
-  {
-   "key": "unv:1784888021273550",
-   "title": "Telecommunications Assistant (Archiving and Records Management)",
-   "url": "https://app.unv.org/opportunities/1784888021273550",
-   "org": "MONUSCO",
-   "source": "UNV",
-   "location": "Bunia, Democratic Republic of the Congo",
-   "grade": "UNV International Specialist",
-   "posted": "2026-10-29",
-   "deadline": "2026-11-12",
-   "first_seen": "2026-11-06",
-   "level": "ref",
-   "info": false,
-   "intern": false,
-   "category": "",
-   "star": false,
-   "star_reason": "",
-   "program": "국제 UNV",
-   "lecture": "UN이 직접 뽑는 국제 UNV는 \"맨땅에 헤딩\" — 외교부·코이카 UNV보다 어렵다. 유급, 끝나면 P 전환 가능.",
-   "refs": "11/05 문단 24–26",
-   "plan": "2029~ 단계. 지금은 불어권 근무지·요구 경력을 미리 보는 용도.",
-   "checks": [
-    "✗ 전문가·경력직 UNV → 관련 경력 필요"
-   ],
-   "opens": "관련 경력 2년 이후(설계상 2029~)",
-   "french": "불어 우대 — 내 강점 (10/29 문단 160–165)",
-   "score": 145,
-   "detail": "unv_1784888021273550"
-  },
-  {
-   "key": "unv:1784888021273552",
-   "title": "Information Systems Assistant (Asset Support)",
-   "url": "https://app.unv.org/opportunities/1784888021273552",
-   "org": "MONUSCO",
-   "source": "UNV",
-   "location": "Bunia, Democratic Republic of the Congo",
-   "grade": "UNV International Specialist",
-   "posted": "2026-10-29",
-   "deadline": "2026-11-12",
-   "first_seen": "2026-11-06",
-   "level": "ref",
-   "info": false,
-   "intern": false,
-   "category": "",
-   "star": false,
-   "star_reason": "",
-   "program": "국제 UNV",
-   "lecture": "UN이 직접 뽑는 국제 UNV는 \"맨땅에 헤딩\" — 외교부·코이카 UNV보다 어렵다. 유급, 끝나면 P 전환 가능.",
-   "refs": "11/05 문단 24–26",
-   "plan": "2029~ 단계. 지금은 불어권 근무지·요구 경력을 미리 보는 용도.",
-   "checks": [
-    "✗ 전문가·경력직 UNV → 관련 경력 필요"
-   ],
-   "opens": "관련 경력 2년 이후(설계상 2029~)",
-   "french": "불어 우대 — 내 강점 (10/29 문단 160–165)",
-   "score": 145,
-   "detail": "unv_1784888021273552"
   },
   {
    "key": "mofa_unrecruit:35606",
