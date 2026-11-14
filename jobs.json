@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-14 21:05",
- "today": "2026-11-14",
+ "updated": "2026-11-15 05:08",
+ "today": "2026-11-15",
  "focus": {
   "until": "2026-12-31",
   "label": "수업에서 언급한 봉사단 + 7대 전략 기구"
@@ -1205,8 +1205,41 @@
    "detail": "io_gggi_4008713201"
   },
   {
+   "key": "io_gggi:4009529201",
+   "title": "CONSULTANT FOR IPCC GUIDELINE TRAINING (FACILITATOR)",
+   "url": "https://job-boards.anz.greenhouse.io/globalgreengrowthinstitute/jobs/4009529201",
+   "org": "Global Green Growth Institute (GGGI)",
+   "source": "글로벌녹색성장연구소(GGGI)",
+   "location": "Indonesia",
+   "grade": "Consultant",
+   "posted": "2026-11-14",
+   "deadline": "2026-11-20",
+   "first_seen": "2026-11-15",
+   "level": "mid",
+   "info": false,
+   "intern": false,
+   "category": "lecture_org",
+   "star": false,
+   "star_reason": "",
+   "program": "한국이 분담금을 많이 내는 기구 (7대 전략 5번)",
+   "lecture": "[글로벌녹색성장연구소 — 개도국 친환경 성장 정책을 돕는 기구. 서울, 한국 주도 설립] 한국이 만들고 돈을 많이 내는 GCF·GGGI·IVI는 한국인 직원 비율이 높다 — \"이 세 개에 네모 쳐라\". 새로 생긴 기구는 사람을 급히 뽑아 선발이 빠르다(6번). 서울 본부 공고와 개도국 현지 사무소(르완다·인도 등) 공고가 함께 올라온다 — 근무지(Duty station)부터 확인",
+   "refs": "11/12 녹음 67:33–69:50, 70:30–77:56 · 강의자료 6쪽",
+   "plan": "Background에 KOICA·Korean government가 보이면 무조건 지원(4-2). G레벨 고참 자리는 학부생 대상 아님 — 인턴·컨설턴트·P1~2 위주로 보기.",
+   "checks": [
+    "· 학력·경력 조건은 공고 확인",
+    "· Background 칸부터 — KOICA·Korean government가 보이면 경력이 좀 모자라도 지원",
+    "· 자격 칸 언어 — Korean 요구면 한국인 자리",
+    "· 맨 아래 — 여성 우대 문구·필기 여부·마감일",
+    "· 회원국 목록에 한국이 있는지(투표권, 4-1)"
+   ],
+   "opens": "",
+   "french": "",
+   "score": 200,
+   "detail": "io_gggi_4009529201"
+  },
+  {
    "key": "io_gggi:4009520201",
-   "title": "India: Senior Technical Associate for FLOWER (Food-Loss & Waste Emission Reductions Food-Loss & Waste Emission Reductions for Climate-Smart Foodsheds) Project",
+   "title": "INDIA: SENIOR TECHNICAL ASSOCIATE FOR FLOWER (FOOD-LOSS & WASTE EMISSION REDUCTIONS FOOD-LOSS & WASTE EMISSION REDUCTIONS FOR CLIMATE-SMART FOODSHEDS) PROJECT",
    "url": "https://job-boards.anz.greenhouse.io/globalgreengrowthinstitute/jobs/4009520201",
    "org": "Global Green Growth Institute (GGGI)",
    "source": "글로벌녹색성장연구소(GGGI)",
