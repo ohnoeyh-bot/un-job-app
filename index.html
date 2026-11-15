@@ -21,6 +21,7 @@
   --accent: #2f6b4f; --accent-soft: #e4efe8;
   --good: #2f7d4f; --good-bg: #e3f1e7; --mid: #8a6a12; --mid-bg: #f6eed6; --ref: #3f6a9a; --ref-bg: #e6eef7;
   --hot: #b4412f; --hot-bg: #f8e5e0; --star: #a86a00;
+  --open: #6b46c1; --open-bg: #efe9fb;
   --serif: "Source Serif 4", Georgia, serif;
   --sans: Inter, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
@@ -30,6 +31,7 @@
     --accent: #7cc49d; --accent-soft: #1d3329;
     --good: #86d0a4; --good-bg: #1d3328; --mid: #e3c46e; --mid-bg: #352d17; --ref: #8db7e6; --ref-bg: #1c2a3a;
     --hot: #f0907e; --hot-bg: #3a221d; --star: #f2b94a;
+    --open: #c4b0f5; --open-bg: #2a2240;
   }
 }
 * { box-sizing: border-box; }
@@ -61,6 +63,10 @@ h2.sec::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .t-mid { color: var(--mid); background: var(--mid-bg); }
 .t-ref { color: var(--ref); background: var(--ref-bg); }
 .t-new { color: #fff; background: var(--accent); }
+.t-open { color: #fff; background: var(--open); }
+.card.open { border-color: var(--open); box-shadow: inset 4px 0 0 var(--open); background: linear-gradient(var(--open-bg), var(--paper) 70%); }
+.openline { font-size: 13px; color: var(--open); font-weight: 600; margin: 6px 0 2px; }
+h2.sec.open { color: var(--open); }
 .t-hot { color: var(--hot); background: var(--hot-bg); }
 .t-plain { color: var(--muted); background: var(--bg); }
 .card h3 { font-size: 17px; line-height: 1.4; margin: 0 0 4px; font-weight: 700; letter-spacing: -.01em; word-break: keep-all; overflow-wrap: anywhere; }
@@ -234,17 +240,19 @@ function card(j) {
   const isNew = j.first_seen && diff(j.first_seen) >= -2;
   const tags = [
     isNew ? `<span class="tag t-new">NEW</span>` : "",
+    j.open_now ? `<span class="tag t-open">🎓 지금 지원 가능${j.open_now === "intern" ? " · 인턴" : ""}</span>` : "",
     `<span class="tag ${lv[0]}">${j.info ? "🟡 참고" : lv[1]}</span>`,
     dTag(j),
-    j.intern ? `<span class="tag t-plain">Intern</span>` : "",
+    j.intern && !j.open_now ? `<span class="tag t-plain">Intern</span>` : "",
   ].join("");
   const where = [j.org, j.location, j.grade].filter(Boolean).join(" · ");
   const checks = (j.checks || []).map((c) => `<li>${esc(c)}</li>`).join("");
   const checkHead = j.level === "ref" && j.opens ? `🔒 언제 열리나 — ${esc(j.opens)}` : "✅ 자격";
-  return `<article class="card">
+  return `<article class="card${j.open_now ? " open" : ""}">
     <div class="tags">${tags}</div>
     <h3>${esc(j.title)}</h3>
     <div class="org">${esc(where)}${j.program ? ` · <i>${esc(j.program)}</i>` : ""}</div>
+    ${j.open_now ? `<div class="openline">🎓 ${esc(j.open_reason)}</div>` : ""}
     ${j.star ? `<div class="star">⭐ 지원해 볼 만함 <span>· ${esc(j.star_reason)}</span></div>` : ""}
     <details class="more"><summary>강의 설명 · 자격 보기</summary>
       ${j.lecture ? `<div class="blk"><b>📖 강의에서</b><p>${esc(j.lecture)} <small>(${esc(j.refs)})</small></p></div>` : ""}
@@ -263,7 +271,9 @@ function card(j) {
 function render(data) {
   const live = data.jobs.filter((j) => !j.deadline || diff(j.deadline) >= 0);
   const order = (a, b) => (b.star - a.star) || (a.deadline || "9999").localeCompare(b.deadline || "9999") || (b.score - a.score);
-  const now = live.filter((j) => j.level !== "ref" && !j.info).sort(order);
+  const openOrder = (a, b) => ((b.open_now === "intern") - (a.open_now === "intern")) || order(a, b);
+  const opens = live.filter((j) => j.open_now && j.level !== "ref" && !j.info).sort(openOrder);
+  const now = live.filter((j) => !j.open_now && j.level !== "ref" && !j.info).sort(order);
   const events = live.filter((j) => j.info).sort(order);
   const later = live.filter((j) => j.level === "ref").sort(order);
 
@@ -272,8 +282,11 @@ function render(data) {
   if (data.focus) { f.hidden = false; f.textContent = `${md(data.focus.until)}까지 ${data.focus.label} 표시`; }
 
   let h = "";
-  h += `<h2 class="sec">지금 지원할 수 있는 공고 ${now.length}</h2>`;
-  h += now.length ? now.map(card).join("") :
+  h += `<h2 class="sec open">🎓 학사·경력 없이 지금 지원 가능 ${opens.length}</h2>`;
+  h += opens.length ? `<p class="note">인턴이 맨 위. 판정은 공고 본문 기준이니 지원 전에 자격을 한 번 더 확인하세요.</p>` + opens.map(card).join("") :
+    `<div class="empty">지금은 없어요. 인턴·봉사단 공고가 올라오면 텔레그램에 🎓로 알려 드려요.</div>`;
+  h += `<h2 class="sec">열린 공고 · 자격 확인 필요 ${now.length}</h2>`;
+  h += now.length ? `<p class="note">학위·경력을 요구하거나 조건이 불분명한 공고. 공고 읽는 연습용.</p>` + now.map(card).join("") :
     `<div class="empty">지금 열린 공고가 없어요.<br>새 공고가 올라오면 텔레그램으로 한 줄 알려 드려요.</div>`;
   if (events.length) h += `<h2 class="sec">설명회·행사 ${events.length}</h2>` + events.map(card).join("");
   if (later.length) h += `<details class="group"><summary><h2 class="sec">아직 자격 미달 · 미리 보기 ${later.length}</h2></summary>
