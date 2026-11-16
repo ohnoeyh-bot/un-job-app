@@ -64,6 +64,7 @@ h2.sec::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .t-ref { color: var(--ref); background: var(--ref-bg); }
 .t-new { color: #fff; background: var(--accent); }
 .t-open { color: #fff; background: var(--open); }
+.t-career { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 600; }
 .card.open { border-color: var(--open); box-shadow: inset 4px 0 0 var(--open); background: linear-gradient(var(--open-bg), var(--paper) 70%); }
 .openline { font-size: 13px; color: var(--open); font-weight: 600; margin: 6px 0 2px; }
 h2.sec.open { color: var(--open); }
@@ -241,6 +242,7 @@ function card(j) {
   const tags = [
     isNew ? `<span class="tag t-new">NEW</span>` : "",
     j.open_now ? `<span class="tag t-open">🎓 지금 지원 가능${j.open_now === "intern" ? " · 인턴" : ""}</span>` : "",
+    j.career ? `<span class="tag t-career">📌 내 후보 · ${esc(j.career)}</span>` : "",
     `<span class="tag ${lv[0]}">${j.info ? "🟡 참고" : lv[1]}</span>`,
     dTag(j),
     j.intern && !j.open_now ? `<span class="tag t-plain">Intern</span>` : "",
