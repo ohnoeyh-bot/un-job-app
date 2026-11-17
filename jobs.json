@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-17 08:53",
+ "updated": "2026-11-17 11:59",
  "today": "2026-11-17",
  "focus": {
   "until": "2026-12-31",
@@ -1573,7 +1573,7 @@
    "location": "Oman",
    "grade": "Staff",
    "posted": "2026-10-30",
-   "deadline": "2026-11-23",
+   "deadline": "2026-11-22",
    "first_seen": "2026-11-14",
    "level": "mid",
    "info": false,
@@ -1721,7 +1721,7 @@
    "location": "Luxembourg",
    "grade": "Staff",
    "posted": "2026-11-16",
-   "deadline": null,
+   "deadline": "2026-12-05",
    "first_seen": "2026-11-17",
    "level": "mid",
    "info": false,
